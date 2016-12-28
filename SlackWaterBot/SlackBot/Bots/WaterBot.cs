@@ -22,14 +22,15 @@ namespace SlackBot.Bots
             OnChannelJoined += _joinedChannel;
             OnMessage += _parseMessage;
         }
-        
-        private Dictionary<string, Action<SlackMessage>> Actions {
+
+        private List<Tuple<Func<string, bool>, Action<SlackMessage>>> Actions
+        {
             get
             {
-                var dic = new Dictionary<string, Action<SlackMessage>>();
-                //dic.Add("Start", (sM) => Start(sM));
-                dic.Add("+1", (sM) => AddOne(sM));
-                dic.Add("-1", (sM) => RemoveOne(sM));
+                var dic = new List<Tuple<Func<string, bool>, Action<SlackMessage>>>();
+                dic.Add(new Tuple<Func<string, bool>, Action<SlackMessage>>(text => text.Contains("+1"), (sM) => AddOne(sM)));
+                dic.Add(new Tuple<Func<string, bool>, Action<SlackMessage>>(text => text.Contains("-1"), (sM) => RemoveOne(sM)));
+
                 return dic;
             }
         }
@@ -84,12 +85,12 @@ namespace SlackBot.Bots
 
         private void RunsActionMethod(SlackMessage slackMessage)
         {
-            // Check with actions should be called
-            var actionsInMsg = Actions.Where(x => MessageService.MessageWithoutBotMention().Contains(x.Key.ToLower()));
+            // Check with actions should be called and call it
+            foreach (var action in this.Actions)
+                if (action.Item1(slackMessage.Text))
+                    action.Item2(slackMessage);
 
-            // Call action
-            foreach (var actionDictionary in actionsInMsg)
-                actionDictionary.Value(slackMessage);
+            SendMessage(slackMessage.Channel, PrintMembersCount());
         }
 
         private void Start(SlackMessage slackMessage)
@@ -106,12 +107,13 @@ namespace SlackBot.Bots
 
             foreach (var item in membersNamesParam)
                 Members.Add(new WaterMember(item.Trim()));
-
-            SendMessage(slackMessage.Channel, PrintMembersCount());
         }
 
         private void AddOne(SlackMessage slackMessage)
         {
+            if (Members == null)
+                Members = new List<WaterMember>();
+
             var member = GetSenderMember(slackMessage);
 
             if (slackMessage.Text.Contains(EmoctionsEnum.Bottle))
@@ -120,12 +122,12 @@ namespace SlackBot.Bots
                 member.GlassCount++;
             else
                 member.BottleCount++;
-
-
-            SendMessage(slackMessage.Channel, PrintMembersCount());
         }
         private void RemoveOne(SlackMessage slackMessage)
         {
+            if (Members == null)
+                Members = new List<WaterMember>();
+
             var member = GetSenderMember(slackMessage);
 
             if (member.BottleCount > 0)
@@ -135,18 +137,14 @@ namespace SlackBot.Bots
                     member.GlassCount--;
                 else
                     member.BottleCount--;
-
-            SendMessage(slackMessage.Channel, PrintMembersCount());
         }
 
 
 
         private WaterMember GetSenderMember(SlackMessage slackMessage)
         {
-            Members = GetWaterMembersListBasedInLastBotMsgInGroup(slackMessage.ChannelID);
-
             if (Members == null)
-                Members = new List<WaterMember>();
+                Members = GetWaterMembersListBasedInLastBotMsgInGroup(slackMessage.ChannelID);
 
             var member = Members.FirstOrDefault(x => string.Equals(x.Name, slackMessage.User.Name, StringComparison.OrdinalIgnoreCase));
 
@@ -185,15 +183,15 @@ namespace SlackBot.Bots
             var lastMsg = GetTodayLastBotMessageInGroup(groupdId);
 
             if (lastMsg == null)
-                return null;
+                return new List<WaterMember>();
 
             string[] splitedLastMsg = lastMsg.Split(new string[] { endLineMark }, StringSplitOptions.RemoveEmptyEntries);
-            
+
             Members = new List<WaterMember>();
 
             foreach (var msgLine in splitedLastMsg)
             {
-                var splitedNameAndQuantity = msgLine.Split(new string[] {":"}, 2, StringSplitOptions.RemoveEmptyEntries);
+                var splitedNameAndQuantity = msgLine.Split(new string[] { ":" }, 2, StringSplitOptions.RemoveEmptyEntries);
                 if (splitedNameAndQuantity.Count() < 2)
                     continue;
 
