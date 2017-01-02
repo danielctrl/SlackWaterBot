@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlackBot", "SlackBot\SlackB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlackBot.Lib", "SlackBot.Lib\SlackBot.Lib.csproj", "{0CC3CB83-4ECE-4399-8EAB-6414ADB57FDB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlackBot.WinService", "SlackBot.WinService\SlackBot.WinService.csproj", "{B6C31542-1854-4769-B50A-65717BCC7C3C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{0CC3CB83-4ECE-4399-8EAB-6414ADB57FDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0CC3CB83-4ECE-4399-8EAB-6414ADB57FDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0CC3CB83-4ECE-4399-8EAB-6414ADB57FDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6C31542-1854-4769-B50A-65717BCC7C3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6C31542-1854-4769-B50A-65717BCC7C3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6C31542-1854-4769-B50A-65717BCC7C3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6C31542-1854-4769-B50A-65717BCC7C3C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -41,6 +41,8 @@ namespace SlackBot.Bots
 
         private List<WaterMember> Members { get; set; }
 
+        public bool IsToShow { get; set; }
+
         private void _joinedChannel(object sender, SlackChannel channel)
         {
             SendMessage(channel,
@@ -90,7 +92,8 @@ namespace SlackBot.Bots
                 if (action.Item1(slackMessage.Text))
                     action.Item2(slackMessage);
 
-            SendMessage(slackMessage.Channel, PrintMembersCount());
+            if (IsToShow) SendMessage(slackMessage.Channel, PrintMembersCount());
+            IsToShow = false;
         }
 
         private void Start(SlackMessage slackMessage)
@@ -122,6 +125,8 @@ namespace SlackBot.Bots
                 member.GlassCount++;
             else
                 member.BottleCount++;
+
+            IsToShow = true;
         }
         private void RemoveOne(SlackMessage slackMessage)
         {
@@ -137,6 +142,8 @@ namespace SlackBot.Bots
                     member.GlassCount--;
                 else
                     member.BottleCount--;
+
+            IsToShow = true;
         }
 
 
